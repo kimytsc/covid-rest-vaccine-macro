@@ -3,21 +3,50 @@
 
 ## 이용방법
 1. Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에서도 이슈는 없을 것 같지만 되도록 크롬 브라우저를 실행해주세요.
-1. [네이버 홈페이지](https://www.naver.com/)에 접근하여 `NAVER 로그인`을 합니다.
-1. [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538)에 접근합니다.  
-   만약, `본인인증`이 떴다면 `본인인증`을 진행해주세요.  
-   `예약신청`이 뜬다면 이어서 진행하시면 됩니다.
-1. [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538)에서 키보드의 `Command + Option + C`(Mac) 또는 `Control + Shift + C`(Windows, Linux, Chrome OS) 또는 `F12`를 눌러 `DevTools`창을 띄웁니다.
-1. `DevTools`창에서 `Console`탭을 누릅니다.  
-   만약, [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538) 창에 `개인정보 수집 및 제공 전체동의(필수)`가 떠있다면, 전체동의 체크박스를 설정하신 후 `DevTools`창의 `Console`탭에서 [개인정보 수집 및 제공 전체동의 제거](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L12)를 실행시켜주고 다시 [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538)에 다시 접근합니다.
-1. [원하는 크기의 지도 좌표를 구하는 방법](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L18)을 참고하여 [내가 원하는 위치의 병원들](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L92)을 설정합니다.
-1. 특정 백신만을 예약하고 싶다면, [choice](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L85)의 주석(`//`)을 제거합니다.
-1. [설정한 소스](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js)를 복사한 후 `DevTools`창의 `Console`에 붙여넣고 실행시킵니다.
-1. `DevTools`창을 끕니다.
+1. 아래의 코드를 `복사`하여 `메모장`이나 `에디터`에 붙여줍니다.
+~~~
+javascript:((my={
+  map: "https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=127.1054288&y=37.3594909&bounds=127.1022772%3B37.3577853%3B127.1085804%3B37.3611964",
+  delay: 500,
+  timeout: 3000,
+  choice: [
+    "VEN00013",/*화이자*/
+    "VEN00014",/*모더나*/
+  ]
+}) => {
+  fetch('https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/bookmark/naver/macro.js')
+  .then(res => res.text())
+  .then(res => {
+    var d=document
+      , s=d.createElement('script');
+    Object.keys(my).forEach(k=>{s.setAttribute(k, my[k])});
+    s.innerHTML=res;
+    d.getElementsByTagName('head')[0].appendChild(s);
+  });
+})()
+~~~
+
+1. [예약을 원하는 지역 고르기](https://github.com/kimytsc/covid-rest-vaccine-macro/tree/bookmark/naver#예약을_원하는_지역_고르기)를 참고하여 코드의 `map:` 부분을 수정해줍니다.
+1. 특정 백신만을 예약하고 싶다면, `choice:` 목록을 제거합니다.  
+   모두 다 제거할 경우, 모든 백신에 대해 신청하게 됩니다.
+1. 수정이 끝난 코드를 복사한 후, 브라우저의 `북마크` 또는 `즐겨찾기`에 추가하여 주세요. 복사한 코드는 URL에 넣으면 됩니다.
+1. `잔여백신 예약을 시도하겠습니다.` 메세지가 뜰때까지 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.
+   만약, 로그인 페이지가 떴다면 `로그인`을 하고 다시 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.
+   만약, 본인인증 페이지가 떴다면 `본인인증`을 진행하고 다시 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.
 1. 정말 간절히 원하면 매크로가 나서서 도와준다.
 
+
+
+## 예약을 원하는 지역 고르기
+ 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
+ 2. "현 지도에서 검색"을 누른다.
+ 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.  
+    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=127.1054288&y=37.3594909&bounds=127.1022772%3B37.3577853%3B127.1085804%3B37.3611964
+ 4. URL을 복사하여 코드의 `map:` 값을 변경해준다.
+
+
 ## 주의사항
-- 예약이 성공한 경우, 예약 성공 페이지가 새창으로 뜨고 정지됩니다.
+- 예약이 성공한 경우, 예약 성공 페이지가 뜨고 정지됩니다.
 - 예약 시도가 반드시 성공 한다는 보장이 없습니다.
 - 창을 하나만 띄워서 써도 충분합니다.
 - 본 프로그램을 사용함으로 생기는 책임은 모두 사용자 본인에게 있습니다.

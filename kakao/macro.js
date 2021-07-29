@@ -1,42 +1,5 @@
 /**
  * 참고: https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/blob/main/vaccine-run-kakao.py
- * 
- * 
- * 작업순서
- * 1. 새 창 또는 새 탭을 열고 "https://www.daum.net"에 들어간다.
- * 2. 로그인을 한다.
- * 3. 새 창 또는 새 탭을 열고 "https://vaccine.kakao.com/api/v1/user"에 들어간다.
- *    만약, "{"error":"error occurred"}" 가 보인다면, 2번의 과정에서 로그아웃 후 다시 로그인을 하고 새로고침을 해본다.
- *    아니라면, 다음 과정을 이어서 한다.
- * 4. 3번창에서 F12를 눌러 DevTools 창을 띄운다
- * 5. 4번창에서 "Console"탭을 누른다.
- * 6. "원하는 크기의 지도 좌표를 구하는 방법"을 참고하여 내가 원하는 위치의 병원들을 설정한다.
- * 7. 아래의 소스를 전부 복사해서 붙여넣고 실행시킨다.
- * 8. 간절히 바라면 매크로가 나서서 도와준다.
- * 
- * 
- * 원하는 크기의 지도 좌표를 구하는 방법
- * 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
- * 2. "현 지도에서 검색"을 누른다.
- * 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.
- *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000
- * 4. url을 복사한 후 아래의 명령어를 값을 바꾸고 실행한다.
-      ((url) => {
-        coords = decodeURIComponent(url).split("bounds=")[1].split(";")
-        console.log(`{
-          bottomRight: {
-            x: ${ coords[0] },
-            y: ${ coords[3] }
-          },
-          onlyLeft: false,
-          order: "latitude",
-          topLeft: {
-            x: ${ coords[2] },
-            y: ${ coords[1] }
-          }
-        }`);
-      })("복사한 URL을 여기에 입력")
- * 5. 출력된 값을 가지고 아래 소스 중 "coords:"" 부분의 값을 변경한다.
  */
 
 (function() {
@@ -45,17 +8,6 @@
       return '0' + number;
     }
     return number;
-  }
-
-  Object.prototype.join = function(separator){
-    var s = this,
-        arr = new Array();
-
-    Object.keys(s).forEach(function(key){
-        arr[arr.length] = key + '=' + s[key];
-    });
-
-    return arr.join(separator || '&')
   }
 
   Date.prototype.toLocalDateTimeString = function() {
@@ -84,6 +36,7 @@
 
 var vaccineMacro = {
   data: {
+    href: 'https://vaccine.kakao.com/api/v1/user',
     delay: 500, // milliseconds
     timeout: 3000,
     reservation: undefined,
@@ -96,14 +49,14 @@ var vaccineMacro = {
     ],
     coords: {
       bottomRight: {
-        x: 126.8770000,
-        y: 37.5170000
+        x: 127.1054100,
+        y: 37.4032979
       },
       onlyLeft: false,
       order: "latitude",
       topLeft: {
-        x: 126.9260000,
-        y: 37.4560000
+        x: 127.1117132,
+        y: 37.3998888
       }
     },
     // sampleOrganizations: [{
@@ -241,4 +194,27 @@ address: ${ reservation.organization.address }
   }
 };
 
-vaccineMacro.init();
+
+
+if (location.href != vaccineMacro.data.href) {
+  alert("예약신청 페이지로 이동합니다. 즐겨찾기를 다시 눌러주세요.");
+  location.href = vaccineMacro.data.href;
+} else if (JSON.parse(document.body.innerText).error) {
+  alert('카카오 로그인 후 다시 시도해주세요.');
+  location.href = "https://accounts.kakao.com/login?continue=https%3A%2F%2Fvaccine.kakao.com%2Fapi%2Fv1%2Fuser";
+} else {
+  if (document.currentScript && document.currentScript.getAttribute('map')) {
+    vaccineMacro.data.map = decodeURIComponent(document.currentScript.getAttribute('map'))
+    vaccineMacro.data.bounds = vaccineMacro.data.map.substring(vaccineMacro.data.map.indexOf("bounds=")+7).split(";");
+    vaccineMacro.data.coords.bottomRight.x = vaccineMacro.data.bounds[0];
+    vaccineMacro.data.coords.bottomRight.y = vaccineMacro.data.bounds[3];
+    vaccineMacro.data.coords.topLeft.x = vaccineMacro.data.bounds[2];
+    vaccineMacro.data.coords.topLeft.y = vaccineMacro.data.bounds[1];
+  };
+  vaccineMacro.data.delay = document.currentScript && document.currentScript.getAttribute('delay') && parseInt(document.currentScript.getAttribute('delay')) || vaccineMacro.data.delay;
+  vaccineMacro.data.timeout = document.currentScript && document.currentScript.getAttribute('timeout') && parseInt(document.currentScript.getAttribute('timeout')) || vaccineMacro.data.timeout;
+  vaccineMacro.data.choice = document.currentScript && document.currentScript.getAttribute('choice') && document.currentScript.getAttribute('choice').split(',') || vaccineMacro.data.choice;
+
+  alert('잔여백신 예약을 시도하겠습니다.');
+  vaccineMacro.init();
+}

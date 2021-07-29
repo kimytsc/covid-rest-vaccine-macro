@@ -1,30 +1,8 @@
 /**
  * 신청현황 확인: https://v-search.nid.naver.com/reservation/me
- * 
- * 
- * 작업순서
- * 1. 새 창 또는 새 탭을 열고 "https://v-search.nid.naver.com/reservation/standby?orgCd=11351853&sid=19514421"에 들어간다.
- *    주소창의 자물쇠를 누르고 "사이트 설정"에 들어간 후 팝업 및 리디렉션을 허용해준다.
- * 2. 1번창에서 F12를 눌러 DevTools 창을 띄운다
- * 3. 2번창에서 "Console"탭을 누른다.
- * 4. 1번의 페이지가 본인인증 단계라면, 본인인증을 하고 예약신청까지 넘어간다
- *    만약, 예약신청 페이지에서 개인정보취급(?) 체크박스가 떠있다면, 아래의 명령어를 Console에 실행해준 후 다시 1번으로 넘어간다.
-      $('#reservation_confirm').addClass('on')[0].click();
- * 5. "원하는 크기의 지도 좌표를 구하는 방법"을 참고하여 내가 원하는 위치의 병원들을 설정한다.
- * 6. 아래의 소스를 전부 복사해서 붙여넣고 실행시킨다.
- * 7. 간절히 바라면 매크로가 나서서 도와준다.
- * 
- * 
- * 원하는 크기의 지도 좌표를 구하는 방법
- * 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
- * 2. "현 지도에서 검색"을 누른다.
- * 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.
- *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000
- * 4. url에서 bounds 부분만 복사한다.
- * 5. 복사한 값을 가지고 아래 소스 중 "bounds:"" 부분의 값을 변경한다.
  */
 
-(function() {
+ (function() {
   // Solved: Mixed Content: The page at 'https://plprice.netlify.app/' was loaded over HTTPS, but requested an insecure script 'https://...'.
   // This request has been blocked; the content must be served over HTTPS.
   var d=document
@@ -38,17 +16,6 @@
       return '0' + number;
     }
     return number;
-  }
-
-  Object.prototype.join = function(separator){
-    var s = this,
-        arr = new Array();
-
-    Object.keys(s).forEach(function(key){
-        arr[arr.length] = key + '=' + s[key];
-    });
-
-    return arr.join(separator || '&')
   }
 
   Date.prototype.toLocalDateTimeString = function() {
@@ -79,6 +46,10 @@
 
 var vaccineMacro = {
   data: {
+    href: {
+      info: "https://v-search.nid.naver.com/reservation/info",
+      standby: 'https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538'
+    },
     delay: 500, // milliseconds
     timeout: 3000,
     reservation: undefined,
@@ -89,8 +60,8 @@ var vaccineMacro = {
       // "VEN00016", // 얀센
       // "VEN00017", // ????????
     ],
-    bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
-    // bounds: "126.8770000;37.4560000;126.9260000;37.5170000",
+    // bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
+    bounds: "126.8770000;37.4560000;126.9260000;37.5170000",
     // sampleOrganizations: [{
     //   id: "19514283",
     //   name: "명소아청소년과의원",
@@ -137,7 +108,7 @@ var vaccineMacro = {
             start: 0,
             display: 100,
             deviceType: "mobile",
-            bounds: decodeURIComponent(vaccineMacro.data.bounds) // 2021-07-26 검색된 병원 198개
+            bounds: vaccineMacro.data.bounds // 2021-07-26 검색된 병원 198개
           }
         },
         query: `query vaccineList($input: RestsInput, $businessesInput: RestsBusinessesInput) {
@@ -234,7 +205,7 @@ var vaccineMacro = {
       switch(res.code) {
         case 'SUCCESS':
           vaccineMacro.data.reservation = bussiness;
-          window.open(`/reservation/success?key=${ key }`);
+          location.href = `/reservation/success?key=${ key }`;
           break;
         case 'SOLD_OUT':
         default:
@@ -250,6 +221,26 @@ message; ${ res.message }
       // error
     })
   }
-}
+};
 
-vaccineMacro.init();
+
+if (`${ location.origin }${ location.pathname }` == vaccineMacro.data.href.info) {
+  if ($('#check_all').length) {
+    alert("개인정보 수집 및 제공 전체동의를 제거하겠습니다. 즐겨찾기를 다시 눌러주세요.")
+    $('#reservation_confirm').addClass('on')[0].click();
+  } else {
+    if (document.currentScript && document.currentScript.getAttribute('map')) {
+      vaccineMacro.data.map = decodeURIComponent(document.currentScript.getAttribute('map'))
+      vaccineMacro.data.bounds = vaccineMacro.data.map.substring(vaccineMacro.data.map.indexOf("bounds=")+7);
+    };
+    vaccineMacro.data.delay = document.currentScript && document.currentScript.getAttribute('delay') && parseInt(document.currentScript.getAttribute('delay')) || vaccineMacro.data.delay;
+    vaccineMacro.data.timeout = document.currentScript && document.currentScript.getAttribute('timeout') && parseInt(document.currentScript.getAttribute('timeout')) || vaccineMacro.data.timeout;
+    vaccineMacro.data.choice = document.currentScript && document.currentScript.getAttribute('choice') && document.currentScript.getAttribute('choice').split(',') || vaccineMacro.data.choice;
+  
+    alert('잔여백신 예약을 시도하겠습니다.');
+    vaccineMacro.init();
+  }
+} else {
+  alert("예약신청 페이지로 이동합니다. 즐겨찾기를 다시 눌러주세요.");
+  location.href = vaccineMacro.data.href.standby;
+}

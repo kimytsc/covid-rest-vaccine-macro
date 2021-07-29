@@ -4,7 +4,6 @@
  * 
  * 작업순서
  * 1. 새 창 또는 새 탭을 열고 "https://v-search.nid.naver.com/reservation/standby?orgCd=11351853&sid=19514421"에 들어간다.
- *    주소창의 자물쇠를 누르고 "사이트 설정"에 들어간 후 팝업 및 리디렉션을 허용해준다.
  * 2. 1번창에서 F12를 눌러 DevTools 창을 띄운다
  * 3. 2번창에서 "Console"탭을 누른다.
  * 4. 1번의 페이지가 본인인증 단계라면, 본인인증을 하고 예약신청까지 넘어간다
@@ -234,7 +233,7 @@ var vaccineMacro = {
       switch(res.code) {
         case 'SUCCESS':
           vaccineMacro.data.reservation = bussiness;
-          window.open(`/reservation/success?key=${ key }`);
+          location.href = `/reservation/success?key=${ key }`;
           break;
         case 'SOLD_OUT':
         default:

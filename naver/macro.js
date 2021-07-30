@@ -229,7 +229,7 @@ var vaccineMacro = {
         default:
           break;
       }
-      vaccineMacro.data.reservation = bussiness;
+      vaccineMacro.data.reservation = Object.assign({datetime: new Date().toLocalDateTimeString()}, bussiness);
     })
     .catch(e => {
       console.log(e);

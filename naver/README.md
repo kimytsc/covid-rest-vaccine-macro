@@ -12,6 +12,8 @@ javascript:((my={
   choice: [
     "VEN00013",/*화이자*/
     "VEN00014",/*모더나*/
+    "VEN00015",/*아스트라제네카*/
+    "VEN00016",/*얀센*/
   ]
 }) => {
   fetch('https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/bookmark/naver/macro.js')
@@ -26,23 +28,23 @@ javascript:((my={
 })()
 ~~~
 
-1. [예약을 원하는 지역 고르기](https://github.com/kimytsc/covid-rest-vaccine-macro/tree/bookmark/naver#예약을_원하는_지역_고르기)를 참고하여 코드의 `map:` 부분을 수정해줍니다.
+1. [예약을 원하는 지역 고르기](https://github.com/kimytsc/covid-rest-vaccine-macro/tree/bookmark/naver#예약을-원하는-지역-고르기)를 참고하여 코드의 `map:` 부분을 수정해줍니다.
 1. 특정 백신만을 예약하고 싶다면, `choice:` 목록을 제거합니다.  
    모두 다 제거할 경우, 모든 백신에 대해 신청하게 됩니다.
 1. 수정이 끝난 코드를 복사한 후, 브라우저의 `북마크` 또는 `즐겨찾기`에 추가하여 주세요. 복사한 코드는 URL에 넣으면 됩니다.
-1. `잔여백신 예약을 시도하겠습니다.` 메세지가 뜰때까지 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.
-   만약, 로그인 페이지가 떴다면 `로그인`을 하고 다시 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.
+1. `잔여백신 예약을 시도하겠습니다.` 메세지가 뜰때까지 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.  
+   만약, 로그인 페이지가 떴다면 `로그인`을 하고 다시 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.  
    만약, 본인인증 페이지가 떴다면 `본인인증`을 진행하고 다시 추가한 `북마크` 또는 `즐겨찾기`를 클릭해주세요.
 1. 정말 간절히 원하면 매크로가 나서서 도와준다.
 
 
 
 ## 예약을 원하는 지역 고르기
- 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
- 2. "현 지도에서 검색"을 누른다.
- 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.  
+ 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만듭니다.
+ 2. "현 지도에서 검색"을 누릅니다.
+ 3. URL이 아래의 예제와 같이 바뀌는걸 확인합니다.  
     ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=127.1054288&y=37.3594909&bounds=127.1022772%3B37.3577853%3B127.1085804%3B37.3611964
- 4. URL을 복사하여 코드의 `map:` 값을 변경해준다.
+ 4. URL을 복사하여 코드의 `map:` 값을 변경해줍니다.
 
 
 ## 주의사항

@@ -39,17 +39,6 @@
     return number;
   }
 
-  Object.prototype.join = function(separator){
-    var s = this,
-        arr = new Array();
-
-    Object.keys(s).forEach(function(key){
-        arr[arr.length] = key + '=' + s[key];
-    });
-
-    return arr.join(separator || '&')
-  }
-
   Date.prototype.toLocalDateTimeString = function() {
     return this.getFullYear() +
       '-' + pad(this.getMonth() + 1) +
@@ -59,21 +48,6 @@
       ':' + pad(this.getSeconds()) +
       '.' + (this.getMilliseconds() / 1000).toFixed(3).slice(2, 5);
   };
-
-  var d=document
-    , s=d.createElement('textarea');
-  s.id="processLogs";
-  s.style.height="500px";
-  s.style.width="250px";
-  s.style.border="1px solid black";
-  d.getElementById(s.id) || d.getElementsByTagName('body')[0].appendChild(s);
-
-  s=d.createElement('textarea');
-  s.id="reservationLogs";
-  s.style.height="500px";
-  s.style.width="500px";
-  s.style.border="1px solid black";
-  d.getElementById(s.id) || d.getElementsByTagName('body')[0].appendChild(s);
 }());
 
 var vaccineMacro = {
@@ -111,16 +85,62 @@ var vaccineMacro = {
     //   }
     // }]
   },
-  log(type, text) {
-    document.getElementById(`${ type }Logs`).innerHTML = text + "\n" + document.getElementById(`${ type }Logs`).innerHTML.substring(0, 1000)
+  mounted() {
+    $('.info_box:eq(1) .info_box_inner').html(`<div class="info_item">
+    <strong class="info_title">예약시도 위치 확인</strong>
+    <div class="error">
+      <img style="width:100%" src="${ vaccineMacro.mapImage() }">
+    </div>
+  </div>`);
+    return vaccineMacro;
   },
-  async init() {
-    vaccineMacro.log('process', `${ new Date().toLocalDateTimeString() } check`);
+  async init(start) {
     var delayCheck = new Date();
     var signal = new AbortController();
     var abort = setTimeout(() => signal.abort(), vaccineMacro.data.timeout);
+    start = start || 0;
 
-    await fetch(`https://api.place.naver.com/graphql`, {
+    await vaccineMacro.graphql(start, signal)
+    .then(res => res.shift())
+    .then(res => {
+      $('.h_title').html(`<span class="accent">${ (res.data.rests.businesses.total || 0).toLocaleString() }개 리스트에서 잔여백신</span> 예약시도중`);
+      $('.info_box:eq(0) .info_box_inner').html(`<div class="info_item">
+        <strong class="info_title">
+          업데이트 시간<div class="notice">${ new Date().toLocalDateTimeString() } 업데이트 시도중</div>
+          <div class="error">
+            ${ new Date(res.data.rests.businesses.vaccineLastSave).toLocalDateTimeString() }
+          </div>
+        </strong>
+      </div>
+      <div class="info_item">
+        <strong class="info_title">
+          예약시도 상태
+        </strong>
+        <div class="error">${
+          vaccineMacro.data.reservation && `${ vaccineMacro.data.reservation.datetime } ${ vaccineMacro.data.reservation.name } 예약시도 실패` || '현재 잔여백신이 없습니다.'
+        }</div>
+      </div>`);
+      start = start + res.data.rests.businesses.items.length < res.data.rests.businesses.total ? start + res.data.rests.businesses.items.length : 0;
+      return res;
+    })
+    .then(res => res.data.rests.businesses.items.filter(item => item.vaccineQuantity && item.vaccineQuantity.totalQuantity > 0))
+    .then(res => vaccineMacro.data.sampleOrganizations || res)
+    .then(res => {
+      while (bussiness = res.shift()) {
+        setTimeout(vaccineMacro.standby, 1, bussiness);
+      }
+    })
+    .catch(e => {})
+    .finally(() => {
+      delayCheck = vaccineMacro.data.delay - (new Date() - delayCheck);
+      setTimeout(vaccineMacro.init, delayCheck < 0 ? 1 : delayCheck, start);
+    });
+
+    clearTimeout(abort);
+
+  },
+  graphql(start, signal) {
+    return fetch(`https://api.place.naver.com/graphql`, {
       method: 'POST',
       headers: {
         "Accept": "application/json, text/plain, */*",
@@ -133,7 +153,7 @@ var vaccineMacro = {
             keyword: "코로나백신위탁의료기관"
           },
           businessesInput: {
-            start: 0,
+            start: start || 0,
             display: 100,
             deviceType: "mobile",
             bounds: decodeURIComponent(vaccineMacro.data.bounds) // 2021-07-26 검색된 병원 198개
@@ -165,38 +185,9 @@ var vaccineMacro = {
           }
         }`
       }]),
-      signal: signal.signal,
+      signal: signal && signal.signal,
     })
     .then(res => res.json())
-    .then(res => res.shift())
-    .then(res => res.data.rests.businesses.items.filter(item => item.vaccineQuantity && item.vaccineQuantity.totalQuantity > 0))
-    .then(res => vaccineMacro.data.sampleOrganizations || res)
-    .then(res => {
-      while (bussiness = res.shift()) {
-        setTimeout(vaccineMacro.standby, 1, bussiness);
-      }
-    })
-    .catch(e => {})
-    .finally(() => {
-      if (vaccineMacro.data.reservation) {
-        var message = `축하합니다! 잔여백신 예약에 성공하셨습니다!
-
-예약시간: ${ new Date().toLocalDateTimeString() }
-병원이름: ${ vaccineMacro.data.reservation.name }
-주소: ${ vaccineMacro.data.reservation.roadAddress }
-`;
-        console.log(message, vaccineMacro.data.reservation);
-        // alert(message); // alert 띄울까 말까... telegram을 연동시키려니 귀찮은데..
-        vaccineMacro.log('reservation', `${ new Date().toLocalDateTimeString() }`);
-      } else {
-        // 아직이군요.. 더 돌려볼까요?
-        delayCheck = vaccineMacro.data.delay - (new Date() - delayCheck);
-        setTimeout(vaccineMacro.init, delayCheck < 0 ? 1 : delayCheck);
-      }
-    });
-
-    clearTimeout(abort);
-
   },
   standby(bussiness) {
     fetch(`https://v-search.nid.naver.com/reservation/standby?orgCd=${ bussiness.vaccineQuantity.vaccineOrganizationCode }&sid=${ bussiness.id }`, {
@@ -232,23 +223,42 @@ var vaccineMacro = {
     .then(res => {
       switch(res.code) {
         case 'SUCCESS':
-          vaccineMacro.data.reservation = bussiness;
           location.href = `/reservation/success?key=${ key }`;
           break;
         case 'SOLD_OUT':
         default:
           break;
       }
-      vaccineMacro.log('reservation', `${ new Date().toLocalDateTimeString() }
-code: ${ res.code }
-message; ${ res.message }
-`);
+      vaccineMacro.data.reservation = bussiness;
     })
     .catch(e => {
       console.log(e);
       // error
     })
+  },
+  mapImage() {
+    function deg2rad(deg) {
+        return deg * (Math.PI/180)
+    }
+  
+    var bounds = decodeURIComponent(vaccineMacro.data.bounds).split(';').map(p => Number(p).toFixed(7))
+      , x = (Math.min(bounds[0], bounds[2]) + (Math.max(bounds[0], bounds[2]) - Math.min(bounds[0], bounds[2])) / 2).toFixed(7)
+      , y = (Math.min(bounds[1], bounds[3]) + (Math.max(bounds[1], bounds[3]) - Math.min(bounds[1], bounds[3])) / 2).toFixed(7)
+      , R = 6371 // Radius of the earth in km
+      , dLon, dLat, a, c, width, height;
+  
+    dLat = deg2rad(bounds[2]-bounds[0]);
+    a = Math.sin(dLat/2) * Math.sin(dLat/2);
+    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    width = (R * c * 100).toFixed(0);
+  
+    dLon = deg2rad(bounds[3]-bounds[1]);
+    a = Math.cos(deg2rad(x)) * Math.cos(deg2rad(x)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    height = (R * c * 200).toFixed(0);
+  
+    return `https://simg.pstatic.net/static.map/v2/map/staticmap.bin?center=${ x }%2C${ y }&level=13&format=jpg&scale=2&dataversion=162.69&caller=naver_mstore&w=${ width }&h=${ height }`;
   }
 }
 
-vaccineMacro.init();
+vaccineMacro.mounted().init();

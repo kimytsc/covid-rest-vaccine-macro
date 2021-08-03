@@ -21,3 +21,6 @@
 - 예약 시도가 반드시 성공 한다는 보장이 없습니다.
 - 창을 하나만 띄워서 써도 충분합니다.
 - 본 프로그램을 사용함으로 생기는 책임은 모두 사용자 본인에게 있습니다.
+
+## 동작화면
+![NAVER 동작 및 결과 화면](https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/main/naver/result.png)

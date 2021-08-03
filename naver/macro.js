@@ -19,8 +19,8 @@
  * 2. "현 지도에서 검색"을 누른다.
  * 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.
  *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000
- * 4. url에서 bounds 부분만 복사한다.
- * 5. 복사한 값을 가지고 아래 소스 중 "bounds:"" 부분의 값을 변경한다.
+ * 4. url을 다 복사하거나 bounds 부분만 복사한다.
+ * 5. 복사한 값을 가지고 아래 소스 중 "bounds:" 부분의 값을 변경한다.
  */
 
 (function() {
@@ -62,7 +62,8 @@ var vaccineMacro = {
       // "VEN00016", // 얀센
       // "VEN00017", // ????????
     ],
-    bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
+    bounds: "https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
+    // bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000;37.4560000;126.9260000;37.5170000",
     // sampleOrganizations: [{
     //   id: "19514283",
@@ -86,6 +87,8 @@ var vaccineMacro = {
     // }]
   },
   mounted() {
+    vaccineMacro.data.bounds = vaccineMacro.data.bounds.indexOf('bounds=') !== -1 && vaccineMacro.data.bounds.split('bounds=')[1] || vaccineMacro.data.bounds;
+
     $('.info_box:eq(1) .info_box_inner').html(`<div class="info_item">
     <strong class="info_title">예약시도 위치 확인</strong>
     <div class="error">
@@ -241,9 +244,9 @@ var vaccineMacro = {
         return deg * (Math.PI/180)
     }
   
-    var bounds = decodeURIComponent(vaccineMacro.data.bounds).split(';').map(p => Number(p).toFixed(7))
-      , x = (Math.min(bounds[0], bounds[2]) + (Math.max(bounds[0], bounds[2]) - Math.min(bounds[0], bounds[2])) / 2).toFixed(7)
-      , y = (Math.min(bounds[1], bounds[3]) + (Math.max(bounds[1], bounds[3]) - Math.min(bounds[1], bounds[3])) / 2).toFixed(7)
+    var bounds = decodeURIComponent(vaccineMacro.data.bounds).split(';').map(p => Number(p))
+      , x = ((bounds[0] + bounds[2]) / 2).toFixed(7)
+      , y = ((bounds[1] + bounds[3]) / 2).toFixed(7)
       , R = 6371 // Radius of the earth in km
       , dLon, dLat, a, c, width, height;
   

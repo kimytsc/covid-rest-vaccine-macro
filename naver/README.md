@@ -9,7 +9,7 @@
    `예약신청`이 뜬다면 이어서 진행하시면 됩니다.
 1. [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538)에서 키보드의 `Command + Option + C`(Mac) 또는 `Control + Shift + C`(Windows, Linux, Chrome OS) 또는 `F12`를 눌러 `DevTools`창을 띄웁니다.
 1. `DevTools`창에서 `Console`탭을 누릅니다.  
-   만약, [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538) 창에 `개인정보 수집 및 제공 전체동의(필수)`가 떠있다면, 전체동의 체크박스를 설정하신 후 `DevTools`창의 `Console`탭에서 [개인정보 수집 및 제공 전체동의 제거](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L12)를 실행시켜주고 다시 [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538)에 다시 접근합니다.
+   만약, [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538) 창에 `개인정보 수집 및 제공 전체동의(필수)`가 떠있다면, 전체동의 체크박스를 설정하신 후 `DevTools`창의 `Console`탭에서 [개인정보 수집 및 제공 전체동의 제거](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L11)를 실행시켜주고 다시 [예약 신청 페이지](https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538)에 다시 접근합니다.
 1. [원하는 크기의 지도 좌표를 구하는 방법](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L18)을 참고하여 [내가 원하는 위치의 병원들](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L92)을 설정합니다.
 1. 특정 백신만을 예약하고 싶다면, [choice](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L85)의 주석(`//`)을 제거합니다.
 1. [설정한 소스](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js)를 복사한 후 `DevTools`창의 `Console`에 붙여넣고 실행시킵니다.

@@ -1,4 +1,4 @@
-# covid-rest-vaccine-macro
+# covid-rest-vaccine-macro [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fkimytsc%2Fcovid-rest-vaccine-macro&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 잔여백신 예약을 자동으로 시도해주는 스크립트입니다.
 
 ## 네이버 잔여백신 예약

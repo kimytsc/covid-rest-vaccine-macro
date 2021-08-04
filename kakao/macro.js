@@ -381,7 +381,7 @@ var vaccineMacro = {
     clearTimeout(abort);
   },
   tryReservation(organization) {
-    fetch(`/api/v2/org/org_code/${ organization.orgCode }`, {
+    fetch(`/api/v3/org/org_code/${ organization.orgCode }`, {
       method: 'GET',
       headers: {
         "Accept": "application/json, text/plain, */*",

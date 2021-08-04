@@ -316,7 +316,7 @@ var vaccineMacro = {
     var signal = new AbortController();
     var abort = setTimeout(() => signal.abort(), vaccineMacro.data.timeout);
 
-    await fetch(`/api/v2/vaccine/left_count_by_coords`, {
+    await fetch(`/api/v3/vaccine/left_count_by_coords`, {
       method: 'POST',
       headers: {
         "Accept": "application/json, text/plain, */*",
@@ -413,7 +413,7 @@ var vaccineMacro = {
     })
     .then(res => {
       while (vaccine = res.lefts.shift()) {
-        !vaccineMacro.data.reservation && fetch(`/api/v1/reservation`, {
+        !vaccineMacro.data.reservation && fetch(`/api/v2/reservation`, {
           method: 'POST',
           headers: {
             "Accept": "application/json, text/plain, */*",

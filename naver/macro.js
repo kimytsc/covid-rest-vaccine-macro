@@ -274,4 +274,14 @@ var vaccineMacro = {
   }
 }
 
+if (dcs = document.currentScript) {
+  if (dcs.getAttribute('map')) {
+    vaccineMacro.data.map = decodeURIComponent(dcs.getAttribute('map'))
+    vaccineMacro.data.bounds = vaccineMacro.data.map.substring(vaccineMacro.data.map.indexOf("bounds=")+7);
+  };
+  vaccineMacro.data.delay = dcs.getAttribute('delay') && parseInt(dcs.getAttribute('delay')) || vaccineMacro.data.delay;
+  vaccineMacro.data.timeout = dcs.getAttribute('timeout') && parseInt(dcs.getAttribute('timeout')) || vaccineMacro.data.timeout;
+  vaccineMacro.data.choice = dcs.getAttribute('choice') && dcs.getAttribute('choice').split(',') || vaccineMacro.data.choice;
+}
+
 vaccineMacro.mounted().init();

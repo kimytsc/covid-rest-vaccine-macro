@@ -543,10 +543,10 @@ if (dcs = document.currentScript) {
   if (dcs.getAttribute('map')) {
     vaccineMacro.data.map = decodeURIComponent(dcs.getAttribute('map'))
     vaccineMacro.data.bounds = vaccineMacro.data.map.substring(vaccineMacro.data.map.indexOf("bounds=")+7);
-    vaccineMacro.data.coords.bottomRight.x = vaccineMacro.data.bounds.split(';')[0];
-    vaccineMacro.data.coords.bottomRight.y = vaccineMacro.data.bounds.split(';')[3];
-    vaccineMacro.data.coords.topLeft.x = vaccineMacro.data.bounds.split(';')[2];
-    vaccineMacro.data.coords.topLeft.y = vaccineMacro.data.bounds.split(';')[1];
+    vaccineMacro.data.coords.bottomRight.x = Number(vaccineMacro.data.bounds.split(';')[0]);
+    vaccineMacro.data.coords.bottomRight.y = Number(vaccineMacro.data.bounds.split(';')[3]);
+    vaccineMacro.data.coords.topLeft.x = Number(vaccineMacro.data.bounds.split(';')[2]);
+    vaccineMacro.data.coords.topLeft.y = Number(vaccineMacro.data.bounds.split(';')[1]);
   };
   vaccineMacro.data.delay = dcs.getAttribute('delay') && parseInt(dcs.getAttribute('delay')) || vaccineMacro.data.delay;
   vaccineMacro.data.timeout = dcs.getAttribute('timeout') && parseInt(dcs.getAttribute('timeout')) || vaccineMacro.data.timeout;

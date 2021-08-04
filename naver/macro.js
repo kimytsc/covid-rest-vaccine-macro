@@ -87,14 +87,24 @@ var vaccineMacro = {
     // }]
   },
   mounted() {
-    vaccineMacro.data.bounds = vaccineMacro.data.bounds.indexOf('bounds=') !== -1 && vaccineMacro.data.bounds.split('bounds=')[1] || vaccineMacro.data.bounds;
+    vaccineMacro.data.bounds = vaccineMacro.data.bounds.indexOf('bounds=') !== -1 && vaccineMacro.data.bounds.substring(vaccineMacro.data.bounds.indexOf("bounds=")+7) || vaccineMacro.data.bounds;
 
     $('.info_box:eq(1) .info_box_inner').html(`<div class="info_item">
-    <strong class="info_title">예약시도 위치 확인</strong>
-    <div class="error">
-      <img style="width:100%" src="${ vaccineMacro.mapImage() }">
-    </div>
-  </div>`);
+      <strong class="info_title">예약시도 위치 확인</strong>
+      <div class="error">
+        <img style="width:100%" src="${ vaccineMacro.mapImage() }">
+      </div>
+    </div>`);
+
+    if ($('.agree_box').length) {
+      // 개인정보 수집 및 제공 전체동의 제거
+      fetch(`/reservation/progress?key=${ $('#reservation_confirm').data('key') }`, {
+        method: 'GET',
+      })
+      .then(res => res.text())
+      .finally(() => $('.agree_box').remove())
+    }
+
     return vaccineMacro;
   },
   async init(start) {

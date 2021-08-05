@@ -236,7 +236,15 @@ var vaccineMacro = {
     .then(res => {
       switch(res.code) {
         case 'SUCCESS':
-          location.href = `/reservation/success?key=${ key }`;
+          if (window && window.navigator && window.navigator.vibrate) {
+            // mobile에서 성공시 진동 알림 추가
+            window.navigator.vibrate(2000);
+            setTimeout(() => {
+              location.href = `/reservation/success?key=${ key }`;
+            }, 2000);
+          } else {
+            location.href = `/reservation/success?key=${ key }`;
+          }
           break;
         case 'SOLD_OUT':
         default:

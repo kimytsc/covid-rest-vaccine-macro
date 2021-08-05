@@ -371,6 +371,11 @@ var vaccineMacro = {
         }));
 
         document.getElementById('processFinish').classList.add('on');
+
+        if (window && window.navigator && window.navigator.vibrate) {
+          // mobile에서 성공시 진동 알림 추가
+          window.navigator.vibrate([500, 250, 500, 250, 500, 250, 500, 250, 500]);
+        }
       } else {
         // 아직이군요.. 더 돌려볼까요?
         delayCheck = vaccineMacro.data.delay - (new Date() - delayCheck);

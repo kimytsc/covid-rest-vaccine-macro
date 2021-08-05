@@ -60,7 +60,7 @@
 
 var vaccineMacro = {
   data: {
-    delay: 500, // milliseconds
+    delay: 1000, // milliseconds
     timeout: 3000,
     reservation: undefined,
     choice: [ // 선택한 백신이 없을 경우, 아무거나 고름
@@ -372,10 +372,15 @@ var vaccineMacro = {
 
         document.getElementById('processFinish').classList.add('on');
 
+        // kakao는 naver와는 달리 성공시 안내 페이지가 없어 페이지 이동 없음
+
         if (window && window.navigator && window.navigator.vibrate) {
           // mobile에서 성공시 진동 알림 추가
           window.navigator.vibrate([500, 250, 500, 250, 500, 250, 500, 250, 500]);
         }
+
+        // sound 출처: https://mixkit.co/free-sound-effects/clap/
+        (new Audio("https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/resources/main/sounds/mixkit-conference-audience-clapping-strongly-476.wav")).play()
       } else {
         // 아직이군요.. 더 돌려볼까요?
         delayCheck = vaccineMacro.data.delay - (new Date() - delayCheck);

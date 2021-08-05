@@ -63,4 +63,4 @@ Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에�
 - 본 프로그램을 사용함으로 생기는 책임은 모두 사용자 본인에게 있습니다.
 
 ## 동작화면
-![NAVER 동작 및 결과 화면](https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/main/naver/result.png)
+![NAVER 동작 및 결과 화면](https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/resources/main/images/naver/result.png)

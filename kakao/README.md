@@ -53,6 +53,7 @@ Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에�
    `{"user":{"name":"나백신","status":"NORMAL","statusDate":null,"statusOrganization":null},"alarms":[],"reservations":[]}`와 같은 메세지가 보인다면 이어서 진행하시면 됩니다.
 1. Chrome 브라우저 주소창에 복사한 소스를 붙여넣고 실행시켜줍니다.  
    주의할 점은, 붙여넣을때 앞에 있는 `javascript:`가 없이 붙여넣어지므로, `javascript:`는 직접 입력한 후 붙여넣으시길 바랍니다.
+1. 잔여백신 예약에 성공할 경우, `박수소리`와 Mobile은 `진동`이 추가로 울리도록 설정되어 있습니다.
 1. 정말 간절히 원하면 매크로가 나서서 도와준다.
 
 ## 주의사항

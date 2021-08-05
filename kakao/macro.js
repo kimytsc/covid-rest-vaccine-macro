@@ -12,7 +12,7 @@
  * 5. 4번창에서 "Console"탭을 누른다.
  * 6. "원하는 크기의 지도 좌표를 구하는 방법"을 참고하여 내가 원하는 위치의 병원들을 설정한다.
  * 7. 아래의 소스를 전부 복사해서 붙여넣고 실행시킨다.
- * 8. 간절히 바라면 매크로가 나서서 도와준다.
+ * 8. 간절히 바라면 스크립트가 나서서 도와준다.
  * 
  * 
  * 원하는 크기의 지도 좌표를 구하는 방법
@@ -60,7 +60,7 @@
 
 var vaccineMacro = {
   data: {
-    delay: 1000, // milliseconds
+    delay: 5000, // milliseconds
     timeout: 3000,
     reservation: undefined,
     choice: [ // 선택한 백신이 없을 경우, 아무거나 고름
@@ -127,7 +127,7 @@ var vaccineMacro = {
     //     over18: true
     //   },
     //   status: "CLOSED",
-    //   leftCount: 0,
+    //   leftCount: 1,
     //   lefts: [{
     //     vaccineType: "Pfizer",
     //     vaccineName: "화이자",
@@ -139,7 +139,7 @@ var vaccineMacro = {
     //     vaccineName: "모더나",
     //     vaccineCode: "VEN00014",
     //     status: "CLOSED",
-    //     leftCount: 0
+    //     leftCount: 1
     //   }],
     //   selectableVaccineCodes: ["VEN00015", "VEN00016", "VEN00013", "VEN00014", "VEN00017"]
     // },
@@ -341,7 +341,7 @@ var vaccineMacro = {
     .then(res => res.organizations.filter(item => item.leftCounts > 0))
     .then(organizations => {
       organizations.forEach(organization => {
-        setTimeout(vaccineMacro.tryReservation, 1, organization)
+        setTimeout(vaccineMacro.standby, 1, organization)
       });
     })
     .finally(() => {
@@ -390,7 +390,7 @@ var vaccineMacro = {
 
     clearTimeout(abort);
   },
-  tryReservation(organization) {
+  standby(organization) {
     fetch(`/api/v3/org/org_code/${ organization.orgCode }`, {
       method: 'GET',
       headers: {
@@ -416,50 +416,59 @@ var vaccineMacro = {
     })
     .then(res => {
       if (vaccineMacro.data.sampleReservation) {
-        vaccineMacro.data.reservation = vaccineMacro.data.sampleReservation; // testcode
+        vaccineMacro.data.reservation = vaccineMacro.data.sampleReservation;
         return {lefts:[]};
       }
       return res;
     })
     .then(res => {
-      while (vaccine = res.lefts.shift()) {
-        !vaccineMacro.data.reservation && fetch(`/api/v2/reservation`, {
-          method: 'POST',
-          headers: {
-            "Accept": "application/json, text/plain, */*",
-            "Content-Type": "application/json;charset=UTF-8",
-            // "Origin": "https://vaccine-map.kakao.com",
-            "Accept-Language": "en-us",
-            // "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.3.8",
-            // "Referer":"https://vaccine-map.kakao.com/",
-            "Accept-Encoding": "gzip, deflate",
-            // "Connection": "Keep-Alive",
-            // "Keep-Alive": "timeout=5, max=1000"
-          },
-          body: JSON.stringify({
-            from: "Map",
-            vaccineCode: vaccine.vaccineCode,
-            orgCode: res.organization.orgCode,
-            distance: "null"
-          })
-        })
-        .then(reservation => reservation.json())
-        .then(reservation => {
-          switch(reservation.code) {
-            case 'SUCCESS': // 성공
-              vaccineMacro.data.reservation = reservation;
-              break;
-            case 'NO_VACANCY': // 선착순 실패
-            case 'NOT_AVAILABLE': // 잔여백신 접종 예약 가능한 시간이 아닙니다.
-            default:
-              // console.log(new Date().toLocalDateTimeString(), reservation.code, reservation.desc, reservation.organization);
-              break;
-          }
-          vaccineMacro.log('lastResult', `[${ reservation.organization.orgName }] ${ reservation.desc.replace(/\n/g, ' ') }`);
-          return true;
-        });
+      while (vaccine = !vaccineMacro.data.reservation && res.lefts.shift()) {
+        setTimeout(vaccineMacro.reservation, 1, organization, vaccine)
       }
     })
+  },
+  async reservation(organization, vaccine) {
+    var signal = new AbortController();
+    var abort = setTimeout(() => signal.abort(), vaccineMacro.data.timeout);
+
+    await fetch(`/api/v2/reservation`, {
+      method: 'POST',
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json;charset=UTF-8",
+        // "Origin": "https://vaccine-map.kakao.com",
+        "Accept-Language": "en-us",
+        // "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.3.8",
+        // "Referer":"https://vaccine-map.kakao.com/",
+        "Accept-Encoding": "gzip, deflate",
+        // "Connection": "Keep-Alive",
+        // "Keep-Alive": "timeout=5, max=1000"
+      },
+      body: JSON.stringify({
+        from: "Map",
+        vaccineCode: vaccine.vaccineCode,
+        orgCode: organization.orgCode,
+        distance: "null"
+      }),
+      signal: signal.signal,
+    })
+    .then(res => res.json())
+    .then(res => {
+      switch(res.code) {
+        case 'SUCCESS': // 성공
+          vaccineMacro.data.reservation = res;
+          break;
+        case 'NO_VACANCY': // 선착순 실패
+        case 'NOT_AVAILABLE': // 잔여백신 접종 예약 가능한 시간이 아닙니다.
+        default:
+          // console.log(new Date().toLocalDateTimeString(), reservation.code, reservation.desc, reservation.organization);
+          break;
+      }
+      vaccineMacro.log('lastResult', `[${ res.organization.orgName }] ${ res.desc.replace(/\n/g, ' ') }`);
+      return true;
+    });
+
+    clearTimeout(abort);
   },
   log(type, text) {
     document.getElementById(`${ type }`).innerHTML = text;

@@ -19,7 +19,7 @@
  * 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
  * 2. "현 지도에서 검색"을 누른다.
  * 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.
- *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000
+ *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=127.1054288&y=37.3594909&bounds=127.1022772%3B37.3577853%3B127.1085804%3B37.3611964
  * 4. url을 복사한 후 아래의 명령어를 값을 바꾸고 실행한다.
       ((url) => {
         coords = decodeURIComponent(url).split("bounds=")[1].split(";")
@@ -60,7 +60,7 @@
 
 var vaccineMacro = {
   data: {
-    delay: 5000, // milliseconds
+    delay: 1000, // milliseconds
     timeout: 3000,
     reservation: undefined,
     choice: [ // 선택한 백신이 없을 경우, 아무거나 고름
@@ -85,10 +85,25 @@ var vaccineMacro = {
         y: 37.4560000
       }
     },
+    // sampleAgreement: {
+    //   agreedAt: null, // "2021-01-01 00:00:00",
+    //   locationAgreedAt: null, // "2021-01-01 00:00:00",
+    //   noticeReadAt: null,
+    //   over18: false,
+    //   over30: false,
+    //   under14: false,
+    // },
+    // sampleStatus: {
+    //   certificate: "EXPIRED", // ACTIVE | EXPIRED
+    //   me: "INACTIVE", // ACTIVE | INACTIVE
+    //   over18: false,
+    //   over30: false,
+    //   under14: false,
+    // },
     // sampleOrganizations: {
     //   organizations: [{
     //     address: "서울 금천구 한내로 62",
-    //     leftCounts: 1,
+    //     leftCounts: 0,
     //     orgCode: "11378751",
     //     orgName: "빈센트의원",
     //     status: "INPUT_YET",
@@ -130,7 +145,7 @@ var vaccineMacro = {
     //     over18: true
     //   },
     //   status: "CLOSED",
-    //   leftCount: 1,
+    //   leftCount: 0,
     //   lefts: [{
     //     vaccineType: "Pfizer",
     //     vaccineName: "화이자",
@@ -142,7 +157,7 @@ var vaccineMacro = {
     //     vaccineName: "모더나",
     //     vaccineCode: "VEN00014",
     //     status: "CLOSED",
-    //     leftCount: 1
+    //     leftCount: 0
     //   }],
     //   selectableVaccineCodes: ["VEN00015", "VEN00016", "VEN00013", "VEN00014", "VEN00017"]
     // },
@@ -463,6 +478,12 @@ var vaccineMacro = {
           break;
         case 'NO_VACANCY': // 선착순 실패
         case 'NOT_AVAILABLE': // 잔여백신 접종 예약 가능한 시간이 아닙니다.
+        case 'NO_SUITABLE': // 화이자・모더나는 18세 이상 (2003.12.31 이전 출생자) 부터 예약 가능하며 아스트라제네카・얀센은 30세 이상 (1991.12.31 이전 출생자) 부터 예약 가능합니다. 접종 가능한 잔여백신은 백신별 공급시기 및 예방접종 계획에 따라 변경될 수 있습니다.
+        case 'ALREADY_RESERVED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
+        case 'NOT_REGISTERED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
+        case 'ERROR_OCCURRED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
+        case 'ALREADY_REGISTERED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
+        case 'POSTPONED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
         default:
           // console.log(new Date().toLocalDateTimeString(), reservation.code, reservation.desc, reservation.organization);
           break;
@@ -558,7 +579,82 @@ var vaccineMacro = {
     h = ((R * i * 200) || 450).toFixed(0);
 
     return `https://map.kakao.com/etc/saveMap.jsp?SCALE=${ scale }&MX=${ (2.5 * a[0]).toFixed(0) }&MY=${ (2.5 * a[1]).toFixed(0) }&type=roadmap&S=0&IW=${ w }&IH=${ h }&LANG=0&COORDSTM=WCONGNAMUL&logo=kakao_logo`;
-  }
+  },
+  agreementCheck() {
+    return fetch(`/api/v1/agreement`, {
+      method: 'GET',
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json;charset=UTF-8",
+        // "Origin": "https://vaccine-map.kakao.com",
+        "Accept-Language": "en-us",
+        // "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.3.8",
+        // "Referer":"https://vaccine-map.kakao.com/",
+        "Accept-Encoding": "gzip, deflate",
+        // "Connection": "Keep-Alive",
+        // "Keep-Alive": "timeout=5, max=1000"
+      },
+    })
+    .then(res => res.json())
+    .then(res => this.data.sampleAgreement || res)
+    .then(res => {
+      if (res.error) {
+        this.log('lastResult', `로그인 후 다시 시도해주세요.`);
+        return false;
+      }
+      if (res.agreedAt === null) {
+        this.log('lastResult', `서비스 이용을 위해서는 본인확인을 위한 카카오 인증서 발급이 필요합니다.<br>카카오톡에서 인증서 발급 후 다시 시도해주세요.`);
+        return false;
+      }
+      if (res.under14 === true) {
+        this.log('lastResult', `만 14세 미만은 서비스를 이용하실 수 없습니다.`);
+        return false;
+      }
+      if (res.over18 !== true) {
+        this.log('lastResult', `잔여백신 접종은 18 세 이상만 가능합니다.`);
+        return false;
+      }
+
+      return this;
+    });
+  },
+  // agreementCheck에서 under14, over18 값이 같이 오고 있어 statusCheck로 체크할 필요가 없어보임
+  // statusCheck() {
+  //   return fetch(`/api/v1/me/status`, {
+  //     method: 'GET',
+  //     headers: {
+  //       "Accept": "application/json, text/plain, */*",
+  //       "Content-Type": "application/json;charset=UTF-8",
+  //       // "Origin": "https://vaccine-map.kakao.com",
+  //       "Accept-Language": "en-us",
+  //       // "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.3.8",
+  //       // "Referer":"https://vaccine-map.kakao.com/",
+  //       "Accept-Encoding": "gzip, deflate",
+  //       // "Connection": "Keep-Alive",
+  //       // "Keep-Alive": "timeout=5, max=1000"
+  //     },
+  //   })
+  //   .then(res => res.json())
+  //   .then(res => this.data.sampleStatus || res)
+  //   .then(res => {
+  //     if (res.error) {
+  //       vaccineMacro.log('lastResult', `로그인 후 다시 시도해주세요.`);
+  //       return false;
+  //     }
+
+  //     if (res.under14 === true) {
+  //       vaccineMacro.log('lastResult', `만 14세 미만은 서비스를 이용하실 수 없습니다.`);
+  //       return false;
+  //     }
+  
+  //     if (res.over18 !== true) {
+  //       vaccineMacro.log('lastResult', `잔여백신 접종은 18 세 이상만 가능합니다.`);
+  //       return false;
+  //     }
+
+  //     return true;
+  //   });
+  // }
 };
 
 if (dcs = document.currentScript) {
@@ -575,4 +671,4 @@ if (dcs = document.currentScript) {
   vaccineMacro.data.choice = dcs.getAttribute('choice') && dcs.getAttribute('choice').split(',') || vaccineMacro.data.choice;
 }
 
-vaccineMacro.mounted().init();
+vaccineMacro.mounted().agreementCheck().then(res => res && res.init());

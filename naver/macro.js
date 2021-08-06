@@ -60,7 +60,10 @@ var vaccineMacro = {
       // "VEN00014", // 모더나
       // "VEN00015", // 아스트라제네카
       // "VEN00016", // 얀센
-      // "VEN00017", // ????????
+      // "VEN00017", // 노바백스
+      // "VEN00018", // 시노팜
+      // "VEN00019", // 시노백
+      // "VEN00020", // 스푸트니크V
     ],
     bounds: "https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
@@ -261,7 +264,10 @@ var vaccineMacro = {
             "모더나": "VEN00014",
             "아스트라제네카": "VEN00015",
             "얀센": "VEN00016",
-            "???": "VEN00017"
+            "노바백스": "VEN00017",
+            "시노팜": "VEN00018",
+            "시노백": "VEN00019",
+            "스푸트니크V": "VEN00020",
           })[vaccine.vaccineType]
         })
       ).filter(vaccine => vaccine.quantity > 0

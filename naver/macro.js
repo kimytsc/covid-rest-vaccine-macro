@@ -153,7 +153,6 @@ var vaccineMacro = {
         setTimeout(vaccineMacro.standby, 1, bussiness);
       }
     })
-    .catch(e => {})
     .finally(() => {
       if (vaccineMacro.data.reservation) {
         vaccineMacro.data.bounds = `${ vaccineMacro.data.reservation.x };${ vaccineMacro.data.reservation.y };${ vaccineMacro.data.reservation.x };${ vaccineMacro.data.reservation.y }`;

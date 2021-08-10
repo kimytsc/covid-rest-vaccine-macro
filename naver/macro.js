@@ -150,7 +150,14 @@ var vaccineMacro = {
     .then(res => vaccineMacro.data.sampleOrganizations || res)
     .then(res => {
       while (bussiness = res.shift()) {
-        setTimeout(vaccineMacro.standby, 1, bussiness);
+        let hasQuantity = false;
+        business.vaccineQuantity.list.forEach(item => {
+          if (item.quantity > 0 && item.vaccineType !== 'AZ') {
+            hasQuantity = true;
+          }
+        });
+
+        hasQuantity && setTimeout(vaccineMacro.standby, 1, bussiness);
       }
     })
     .finally(() => {

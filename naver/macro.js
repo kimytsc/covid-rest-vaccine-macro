@@ -76,18 +76,22 @@ var vaccineMacro = {
     //   x: "126.8971880",
     //   y: "37.4926510",
     //   vaccineQuantity: {
-    //     totalQuantity: 0,
+    //     totalQuantity: 3,
     //     startTime: "0900",
     //     endTime: "1900",
     //     vaccineOrganizationCode: "11346957",
     //     list: [{
-    //       quantity: 0,
+    //       quantity: 1,
     //       quantityStatus: "waiting",
     //       vaccineType: "화이자"
     //     }, {
-    //       quantity: 0,
+    //       quantity: 1,
     //       quantityStatus: "waiting",
     //       vaccineType: "모더나"
+    //     }, {
+    //       quantity: 1,
+    //       quantityStatus: "waiting",
+    //       vaccineType: "AZ"
     //     }]
     //   }
     // }]
@@ -149,15 +153,24 @@ var vaccineMacro = {
     .then(res => res.data.rests.businesses.items.filter(item => item.vaccineQuantity && item.vaccineQuantity.totalQuantity > 0))
     .then(res => vaccineMacro.data.sampleOrganizations || res)
     .then(res => {
-      while (bussiness = res.shift()) {
-        let hasQuantity = false;
-        business.vaccineQuantity.list.forEach(item => {
-          if (item.quantity > 0 && item.vaccineType !== 'AZ') {
-            hasQuantity = true;
-          }
+      while (business = res.shift()) {
+        business.vaccineQuantity.list.map(vaccine => Object.assign(vaccine, {
+            vaccineCode: ({
+              "화이자": "VEN00013",
+              "모더나": "VEN00014",
+              "AZ": "VEN00015", 
+              "얀센": "VEN00016",
+              "노바백스": "VEN00017",
+              "시노팜": "VEN00018",
+              "시노백": "VEN00019",
+              "스푸트니크V": "VEN00020",
+            })[vaccine.vaccineType]
+          })
+        )
+        .filter(vaccine => vaccine.quantity > 0 && (vaccineMacro.data.choice.length == 0 || vaccineMacro.data.choice.indexOf(vaccine.vaccineCode) !== -1))
+        .forEach(vaccine => {
+          setTimeout(vaccineMacro.standby, 1, business, vaccine);
         });
-
-        hasQuantity && setTimeout(vaccineMacro.standby, 1, bussiness);
       }
     })
     .finally(() => {
@@ -258,33 +271,14 @@ var vaccineMacro = {
     })
     .then(res => res.json())
   },
-  standby(bussiness) {
-    fetch(`https://v-search.nid.naver.com/reservation/standby?orgCd=${ bussiness.vaccineQuantity.vaccineOrganizationCode }&sid=${ bussiness.id }`, {
+  standby(business, vaccine) {
+    fetch(`https://v-search.nid.naver.com/reservation/standby?orgCd=${ business.vaccineQuantity.vaccineOrganizationCode }&sid=${ business.id }`, {
       method: 'GET',
     })
     .then(res => res.url.split('key=')[1])
-    .then(key => {
-      var vaccines = bussiness.vaccineQuantity.list.map(vaccine => Object.assign(vaccine, {
-          vaccineCode: ({
-            "화이자": "VEN00013",
-            "모더나": "VEN00014",
-            "아스트라제네카": "VEN00015",
-            "얀센": "VEN00016",
-            "노바백스": "VEN00017",
-            "시노팜": "VEN00018",
-            "시노백": "VEN00019",
-            "스푸트니크V": "VEN00020",
-          })[vaccine.vaccineType]
-        })
-      ).filter(vaccine => vaccine.quantity > 0
-        && (vaccineMacro.data.choice.length == 0 || vaccineMacro.data.choice.length && vaccineMacro.data.choice.indexOf(vaccine.vaccineCode) !== -1)
-      );
-      while(vaccine = vaccines.shift()) {
-        setTimeout(vaccineMacro.reservation, 1, bussiness, key, vaccine.vaccineCode)
-      }
-    });
+    .then(key => setTimeout(vaccineMacro.reservation, 1, business, key, vaccine.vaccineCode))
   },
-  reservation(bussiness, key, cd) {
+  reservation(business, key, cd) {
     fetch(`/reservation/progress?key=${ key }&cd=${ cd }`, {
       method: 'GET',
     })
@@ -295,17 +289,13 @@ var vaccineMacro = {
     .then(res => {
       switch(res.code) {
         case 'SUCCESS':
-          vaccineMacro.data.reservation = Object.assign({datetime: new Date().toLocalDateTimeString(), key: key}, bussiness);
+          vaccineMacro.data.reservation = Object.assign({datetime: new Date().toLocalDateTimeString(), key: key}, business);
           break;
         case 'SOLD_OUT':
         default:
           break;
       }
-      vaccineMacro.log('lastResult', `[${ bussiness.name }] 예약시도 실패`);
-    })
-    .catch(e => {
-      console.log(e);
-      // error
+      vaccineMacro.log('lastResult', `[${ business.name }] 예약시도 실패`);
     })
   },
   log(type, text) {

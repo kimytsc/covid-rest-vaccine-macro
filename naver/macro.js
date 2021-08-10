@@ -120,7 +120,7 @@ var vaccineMacro = {
     $('.info_box:eq(1) .info_box_inner').html(`<div class="info_item">
       <strong class="info_title">예약시도 위치 확인</strong>
       <div class="error">
-        <img style="width:100%" src="${ vaccineMacro.mapImage() }">
+        <img src="${ vaccineMacro.mapImage() }">
       </div>
     </div>`);
 
@@ -323,6 +323,12 @@ var vaccineMacro = {
     a = Math.cos(deg2rad(x)) * Math.cos(deg2rad(x)) * Math.sin(dLon/2) * Math.sin(dLon/2);
     c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     height = ((R * c * 200) || 450).toFixed(0);
+
+    while(width > 520 || height > 520) {
+      width = parseInt(width / 2);
+      height = parseInt(height / 2);
+      level -= 1;
+    }
   
     return `https://simg.pstatic.net/static.map/v2/map/staticmap.bin?center=${ x }%2C${ y }&level=${ level }&format=jpg&scale=1&dataversion=162.69&caller=naver_mstore&w=${ width }&h=${ height }`;
   }

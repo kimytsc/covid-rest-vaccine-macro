@@ -323,7 +323,7 @@ var vaccineMacro = {
                 <div class="info_box_inner"><div class="info_item">
                   <strong class="info_title">예약시도 위치 확인</strong>
                   <div class="error">
-                    <img style="width:100%" src="${ vaccineMacro.mapImage() }">
+                    <img src="${ vaccineMacro.mapImage() }">
                   </div>
                 </div>
               </div>
@@ -590,12 +590,17 @@ var vaccineMacro = {
     v = Math.sin(l/2) * Math.sin(l/2);
     i = 2 * Math.atan2(Math.sqrt(v), Math.sqrt(1-v));
     w = ((R * i * 100) || 450).toFixed(0);
-    w = w > 520 ? 520 : w;
   
     l = deg2rad(vaccineMacro.data.coords.topLeft.y - vaccineMacro.data.coords.bottomRight.y);
     v = Math.cos(deg2rad(x)) * Math.cos(deg2rad(x)) * Math.sin(l/2) * Math.sin(l/2);
     i = 2 * Math.atan2(Math.sqrt(v), Math.sqrt(1-v));
     h = ((R * i * 200) || 450).toFixed(0);
+
+    while (w > 520 || h > 520) {
+      w = parseInt(w / 2);
+      h = parseInt(h / 2);
+      scale *= 2;
+    }
 
     return `https://map.kakao.com/etc/saveMap.jsp?SCALE=${ scale }&MX=${ (2.5 * a[0]).toFixed(0) }&MY=${ (2.5 * a[1]).toFixed(0) }&type=roadmap&S=0&IW=${ w }&IH=${ h }&LANG=0&COORDSTM=WCONGNAMUL&logo=kakao_logo`;
   },

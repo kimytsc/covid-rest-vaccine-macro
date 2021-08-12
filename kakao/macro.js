@@ -212,6 +212,10 @@ var vaccineMacro = {
     .apply_area .info_box .info_title {
       color:#000000;
     }
+    .apply_area .info_box .info_title .notice {
+      margin-left: 10px;
+      color: #B3B3B3;
+    }
     .apply_area .info_box {
       background: #000000;
       background: linear-gradient(to right,#FEE500 0,#FEE500 100%);
@@ -302,7 +306,7 @@ var vaccineMacro = {
                 <div class="info_box_inner">
                   <div class="info_item">
                     <strong class="info_title">
-                      업데이트 시간<div class="notice"><span id="nowUpdate"></span> 업데이트 시도중</div>
+                      업데이트 시간<span class="notice"><span id="nowUpdate"></span> 업데이트 시도중</span>
                       <div class="error">
                         <span id="lastUpdate"></span>
                       </div>
@@ -595,6 +599,12 @@ var vaccineMacro = {
     v = Math.cos(deg2rad(x)) * Math.cos(deg2rad(x)) * Math.sin(l/2) * Math.sin(l/2);
     i = 2 * Math.atan2(Math.sqrt(v), Math.sqrt(1-v));
     h = ((R * i * 200) || 450).toFixed(0);
+
+    while (w < 520 || h < 520) {
+      w = parseInt(w * 2);
+      h = parseInt(h * 2);
+      scale /= 2;
+    }
 
     while (w > 520 || h > 520) {
       w = parseInt(w / 2);

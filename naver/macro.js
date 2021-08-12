@@ -32,6 +32,15 @@
   s.content="upgrade-insecure-requests";
   d.getElementsByTagName('head')[0].appendChild(s);
 
+  s=d.createElement('style');
+  s.id="naverColor";
+  s.innerText = `
+  .apply_area .info_box .info_title .notice {
+    margin-left: 10px;
+    color: #B3B3B3;
+  }`;
+  d.getElementById(s.id) || d.getElementsByTagName('head')[0].appendChild(s);
+
   function pad(number) {
     if (number < 10) {
       return '0' + number;
@@ -102,7 +111,7 @@ var vaccineMacro = {
     $('.h_title').html(`<span class="accent"><span id="organizations">0</span>개 리스트에서 잔여백신</span> 예약시도중`);
     $('.info_box:eq(0) .info_box_inner').html(`<div class="info_item">
       <strong class="info_title">
-        업데이트 시간<div class="notice"><span id="nowUpdate"></span> 업데이트 시도중</div>
+        업데이트 시간<span class="notice"><span id="nowUpdate"></span> 업데이트 시도중</span>
         <div class="error">
           <span id="lastUpdate"></span>
         </div>
@@ -323,6 +332,12 @@ var vaccineMacro = {
     a = Math.cos(deg2rad(x)) * Math.cos(deg2rad(x)) * Math.sin(dLon/2) * Math.sin(dLon/2);
     c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     height = ((R * c * 200) || 450).toFixed(0);
+
+    while(width < 520 || height < 520) {
+      width = parseInt(width * 2);
+      height = parseInt(height * 2);
+      level += 1;
+    }
 
     while(width > 520 || height > 520) {
       width = parseInt(width / 2);

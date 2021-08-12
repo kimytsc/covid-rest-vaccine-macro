@@ -13,6 +13,7 @@ Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에�
 1. 특정 백신만을 예약하고 싶다면, [choice](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js#L58)의 주석(`//`)을 제거합니다.
 1. [설정한 소스](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/naver/macro.js)를 복사한 후 `DevTools`창의 `Console`에 붙여넣고 실행시킵니다.
 1. `DevTools`창을 끕니다.
+1. 잔여백신 예약에 성공할 경우, `박수소리`와 Mobile은 `진동`이 추가로 울리도록 설정되어 있습니다.
 1. 정말 간절히 원하면 스크립트가 나서서 도와준다.
 
 ## Mobile & PC 이용방법

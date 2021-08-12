@@ -359,4 +359,9 @@ if (dcs = document.currentScript) {
   vaccineMacro.data.choice = dcs.getAttribute('choice') && dcs.getAttribute('choice').split(',') || vaccineMacro.data.choice;
 }
 
-vaccineMacro.mounted().init();
+if (location.pathname === "/reservation/info") {
+  vaccineMacro.mounted().init();
+} else {
+  alert('예약신청 페이지에서만 사용 가능합니다.\n\n예약신청 페이지로 이동하니, 다시 시도해주세요.');
+  location.href = "https://v-search.nid.naver.com/reservation/standby?orgCd=41376633&sid=1085568538"
+}

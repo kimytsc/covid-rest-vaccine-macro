@@ -705,4 +705,9 @@ if (dcs = document.currentScript) {
   vaccineMacro.data.choice = dcs.getAttribute('choice') && dcs.getAttribute('choice').split(',') || vaccineMacro.data.choice;
 }
 
-vaccineMacro.mounted().agreementCheck().then(res => res && res.init());
+if (location.pathname === "/api/v1/user") {
+  vaccineMacro.mounted().agreementCheck().then(res => res && res.init());
+} else {
+  alert('내 정보 확인 페이지에서 사용 가능합니다.\n\n내 정보 확인 페이지로 이동하니, 다시 시도해주세요.');
+  location.href = "https://vaccine.kakao.com/api/v1/user"
+}

@@ -96,14 +96,14 @@ var vaccineMacro = {
     //   locationAgreedAt: null, // "2021-01-01 00:00:00",
     //   noticeReadAt: null,
     //   over18: false,
-    //   over50: false,
+    //   over30: false,
     //   under14: false,
     // },
     // sampleStatus: {
     //   certificate: "EXPIRED", // ACTIVE | EXPIRED
     //   me: "INACTIVE", // ACTIVE | INACTIVE
     //   over18: false,
-    //   over50: false,
+    //   over30: false,
     //   under14: false,
     // },
     // sampleOrganizations: {
@@ -147,7 +147,7 @@ var vaccineMacro = {
     //     agreedAt: "2021-07-28 01:12:37",
     //     locationAgreedAt: "2021-07-28 01:12:37",
     //     under14: false,
-    //     over50: true,
+    //     over30: true,
     //     over18: true
     //   },
     //   status: "CLOSED",
@@ -374,7 +374,7 @@ var vaccineMacro = {
       return organizations
     })
     .then(organizations => {
-      // 트래픽 이슈 또는 AZ와 같이 50대 이상만 신청할 수 있어 백신 수량이 남아 있는 경우, remember 설정값 이내의 요청된 결과 값과 비교하여 다를 경우에만 진행하여 잦은 호출 하지 않도록 개선
+      // 트래픽 이슈 또는 AZ와 같이 백신 수량이 계속 남아 있는 경우, remember 설정값 이내의 요청된 결과 값과 비교하여 다를 경우에만 진행하여 잦은 호출 하지 않도록 개선
       let now = new Date().getTime();
       return organizations.filter(item => {
         return vaccineMacro.data.remember.organizations[item.orgCode] === undefined
@@ -497,16 +497,16 @@ var vaccineMacro = {
     .then(res => {
       switch(res.code) {
         case 'SUCCESS': // 성공
-          vaccineMacro.data.reservation = res;
-          break;
-        case 'NO_VACANCY': // 선착순 실패
-        case 'NOT_AVAILABLE': // 잔여백신 접종 예약 가능한 시간이 아닙니다.
-        case 'NO_SUITABLE': // 화이자・모더나는 18세 이상 (2003.12.31 이전 출생자) 부터 예약 가능하며 아스트라제네카는 50세 이상 (1971.12.31 이전 출생자) 부터 예약 가능합니다. 접종 가능한 잔여백신은 백신별 공급시기 및 예방접종 계획에 따라 변경될 수 있습니다.
         case 'ALREADY_RESERVED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
         case 'NOT_REGISTERED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
         case 'ERROR_OCCURRED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
         case 'ALREADY_REGISTERED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
         case 'POSTPONED': // 백신접종 예약내역이 있거나 이미 접종을 하신 경우 잔여백신 접종 신청이 불가합니다.
+          vaccineMacro.data.reservation = res;
+          break;
+        case 'NO_VACANCY': // 선착순 실패
+        case 'NOT_AVAILABLE': // 잔여백신 접종 예약 가능한 시간이 아닙니다.
+        case 'NO_SUITABLE': // 화이자・모더나는 18세 이상 (2003.12.31 이전 출생자) 부터 예약 가능하며 아스트라제네카는 30세 이상 (1991.12.31 이전 출생자) 부터 예약 가능합니다. 접종 가능한 잔여백신은 백신별 공급시기 및 예방접종 계획에 따라 변경될 수 있습니다.
         default:
           // console.log(new Date().toLocalDateTimeString(), reservation.code, reservation.desc, reservation.organization);
           break;

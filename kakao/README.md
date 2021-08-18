@@ -2,22 +2,11 @@
 잔여백신 API로 남은 백신 수를 확인하고, 잔여백신이 있는 경우 예약 시도를 해줍니다.
 
 ## PC 이용방법
-Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에서도 이슈는 없을 것 같지만 되도록 크롬 브라우저를 실행해주세요.
-1. [다음 홈페이지](https://www.daum.net/)에 접근하여 `카카오 계정으로 로그인`을 합니다.
-1. [내 정보 확인](https://vaccine.kakao.com/api/v1/user)에 접근합니다.  
-   만약, `{"error":"error occurred"}`가 보인다면, 로그아웃 후 다시 로그인을 시도해주세요.  
-   `{"user":{"name":"나백신","status":"NORMAL","statusDate":null,"statusOrganization":null},"alarms":[],"reservations":[]}`와 같은 메세지가 보인다면 이어서 진행하시면 됩니다.
-1. [내 정보 확인](https://vaccine.kakao.com/api/v1/user)에서 키보드의 `Command + Option + C`(Mac) 또는 `Control + Shift + C`(Windows, Linux, Chrome OS) 또는 `F12`를 눌러 `DevTools`창을 띄웁니다.
-1. `DevTools`창에서 `Console`탭을 누릅니다.
-1. [원하는 크기의 지도 좌표를 구하는 방법](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/kakao/macro.js#L18)을 참고하여 [내가 원하는 위치의 병원들](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/kakao/macro.js#L73)을 설정합니다.
-1. 특정 백신만을 예약하고 싶다면, [choice](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/kakao/macro.js#L66)의 주석(`//`)을 제거합니다.
-1. [설정한 소스](https://github.com/kimytsc/covid-rest-vaccine-macro/blob/main/kakao/macro.js)를 복사한 후 `DevTools`창의 `Console`에 붙여넣고 실행시킵니다.
-1. `DevTools`창을 끕니다.
-1. 잔여백신 예약에 성공할 경우, `박수소리`와 Mobile은 `진동`이 추가로 울리도록 설정되어 있습니다.
-1. 정말 간절히 원하면 스크립트가 나서서 도와준다.
+2021년 8월 19일 00시부로 웹 로그인 연동이 되지 않아 확인중이며, PC에서 이용이 불가능합니다.
 
-## Mobile & PC 이용방법
-Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에서도 이슈는 없을 것 같지만 되도록 크롬 브라우저를 실행해주세요.
+## Mobile
+2021년 8월 19일 00시부로 웹 로그인 연동 이슈로 인해, 카카오톡의 브라우저를 활용하여 우회하는 방법입니다.
+1. `나와의 채팅`을 열고, `https://accounts.kakao.com/login?continue=https%3A%2F%2Fvaccine-map.kakao.com%2Fapi%2Fv1%2Fuser` 메세지를 먼저 남겨둡니다.
 1. 아래의 소스를 복사하여 메모 어플 등을 활용하여 편집할 준비를 해줍니다.
     ~~~
     javascript:((my={
@@ -51,14 +40,10 @@ Chrome 브라우저에서만 테스트를 하였습니다. 타 브라우저에�
 1. 특정 백신만을 예약하고 싶다면, `복사한 소스`의 `choice`에서 특정 백신만 남기고 나머지를 제거합니다.  
    모두 제거한다면, 모든 백신을 대상으로 진행합니다.
 1. `수정한 소스` 복사합니다.
-1. [다음 홈페이지](https://m.daum.net/)에 접근하여 `카카오 계정으로 로그인`을 합니다.
-   이미 `로그인`이 되어 있다면, 이어서 진행해주세요.
-1. [내 정보 확인](https://vaccine.kakao.com/api/v1/user)에 접근합니다.  
-   만약, `{"error":"error occurred"}`가 보인다면, 로그아웃 후 다시 로그인을 시도해주세요.  
-   `{"user":{"name":"나백신","status":"NORMAL","statusDate":null,"statusOrganization":null},"alarms":[],"reservations":[]}`와 같은 메세지가 보인다면 이어서 진행하시면 됩니다.
-1. Chrome 브라우저 주소창에 복사한 소스를 붙여넣고 실행시켜줍니다.  
-   주의할 점은, 붙여넣을때 앞에 있는 `javascript:`가 없이 붙여넣어지므로, `javascript:`는 직접 입력한 후 붙여넣으시길 바랍니다.
-1. 잔여백신 예약에 성공할 경우, `박수소리`와 Mobile은 `진동`이 추가로 울리도록 설정되어 있습니다.
+1. `카카오톡`의 `나와의 채팅`에 적어놓은 링크를 누르고 `카카오 계정으로 로그인`을 합니다.
+1. `카카오톡 브라우저` 주소창에 복사한 소스를 붙여넣고 실행시켜줍니다.  
+   다만, 이전과는 다르게 붙여넣을때 앞에 있는 `javascript:`가 존재하므로 확인할 필요 없이 바로 실행시켜줍니다.
+1. 잔여백신 예약에 성공할 경우, `박수소리`와 Mobile은 `진동`이 추가로 울리도록 설정되어 있습니다.  
 1. 정말 간절히 원하면 스크립트가 나서서 도와준다.
 
 ## 주의사항

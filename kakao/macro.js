@@ -425,9 +425,9 @@ var vaccineMacro = {
 
         // telegram
         telegram.sendMessage(`축하합니다! 잔여백신 예약에 성공하셨습니다!
-병원이름: ${ vaccineMacro.data.reservation.orgName }
-전화번호: ${ vaccineMacro.data.reservation.phoneNumber }
-병원주소: ${ vaccineMacro.data.reservation.address }
+병원이름: ${ vaccineMacro.data.reservation.organization.orgName }
+전화번호: ${ vaccineMacro.data.reservation.organization.phoneNumber }
+병원주소: ${ vaccineMacro.data.reservation.organization.address }
 운영종료: 오늘 ${ vaccineMacro.data.reservation.organization.openHour.openHour.end } 까지 (${ vaccineMacro.data.reservation.organization.openHour.date } ${ vaccineMacro.data.reservation.organization.openHour.dayOfWeek })
 병원위치: ${ vaccineMacro.mapImage(5) }
 결과확인: https://talk-apps.kakao.com/scheme/kakaotalk://con/web?url=https%3A%2F%2Fvaccine-map.kakao.com%2Freservation%2Fcomplete&closable=false`);

@@ -26,7 +26,9 @@
           /*"VEN00018",/*시노팜, 기본값에서 제거, 필요시 '/*"VEN00018'의 '/*' 제거*/
           /*"VEN00019",/*시노백, 기본값에서 제거, 필요시 '/*"VEN00019'의 '/*' 제거*/
           /*"VEN00020",/*스푸트니크V, 기본값에서 제거, 필요시 '/*"VEN00020'의 '/*' 제거*/
-        ]
+        ],
+        telegramBotId: '',/*telegram botId*/
+        telegramChatId: '',/*telegram chatId*/
     }) => {
     fetch('https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/main/kakao/macro.js')
     .then(res => res.text())

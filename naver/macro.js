@@ -77,33 +77,57 @@ var vaccineMacro = {
     bounds: "https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000;37.4560000;126.9260000;37.5170000",
-    // sampleOrganizations: [{
-    //   id: "19514283",
-    //   name: "명소아청소년과의원",
-    //   phone: "02-0000-0000",
-    //   roadAddress: "서울 영등포구 도림로38길 4",
-    //   x: "126.8971880",
-    //   y: "37.4926510",
-    //   vaccineQuantity: {
-    //     totalQuantity: 3,
-    //     startTime: "0900",
-    //     endTime: "1900",
-    //     vaccineOrganizationCode: "11346957",
-    //     list: [{
-    //       quantity: 1,
-    //       quantityStatus: "waiting",
-    //       vaccineType: "화이자"
-    //     }, {
-    //       quantity: 1,
-    //       quantityStatus: "waiting",
-    //       vaccineType: "모더나"
-    //     }, {
-    //       quantity: 1,
-    //       quantityStatus: "waiting",
-    //       vaccineType: "AZ"
-    //     }]
-    //   }
-    // }]
+    telegram: {
+      botId: '759557168:AAE-kgXK7nAx3kk61A3J-M-iyeMNGo3i7tk',
+      chatId: '695009978',
+      sendMessage(message) {
+        return fetch(`https://api.telegram.org/bot${this.botId}/sendMessage`, {
+          method: 'POST',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: this.chatId,
+            text: (message || "").toString().substr(0, 1024)
+          })
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (!res.ok && res.parameters && res.parameters.migrate_to_chat_id) {
+            this.chatId = res.parameters.migrate_to_chat_id;
+            return this.sendMessage(message);
+          }
+        })
+      }
+    },
+    sampleOrganizations: [{
+      id: "19514283",
+      name: "명소아청소년과의원",
+      phone: "02-0000-0000",
+      roadAddress: "서울 영등포구 도림로38길 4",
+      x: "126.8971880",
+      y: "37.4926510",
+      vaccineQuantity: {
+        totalQuantity: 3,
+        startTime: "0900",
+        endTime: "1900",
+        vaccineOrganizationCode: "11346957",
+        list: [{
+          quantity: 1,
+          quantityStatus: "waiting",
+          vaccineType: "화이자"
+        }, {
+          quantity: 1,
+          quantityStatus: "waiting",
+          vaccineType: "모더나"
+        }, {
+          quantity: 1,
+          quantityStatus: "waiting",
+          vaccineType: "AZ"
+        }]
+      }
+    }]
   },
   mounted() {
     vaccineMacro.data.bounds = vaccineMacro.data.bounds.indexOf('bounds=') !== -1 && vaccineMacro.data.bounds.substring(vaccineMacro.data.bounds.indexOf("bounds=")+7) || vaccineMacro.data.bounds;
@@ -217,6 +241,15 @@ var vaccineMacro = {
 
         // sound 출처: https://mixkit.co/free-sound-effects/clap/
         (new Audio("https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/resources/main/sounds/mixkit-conference-audience-clapping-strongly-476.wav")).play()
+
+        // telegram
+        telegram.sendMessage(`축하합니다! 잔여백신 예약에 성공하셨습니다!
+병원이름: ${ vaccineMacro.data.reservation.name }
+전화번호: ${ vaccineMacro.data.reservation.phone }
+병원주소: ${ vaccineMacro.data.reservation.roadAddress }
+운영종료: 오늘 ${ vaccineMacro.data.reservation.vaccineQuantity.endTime } 까지 (${ new Date().toLocaleDateString() } ${ (['일','월','화','수','목','금','토',])[new Date().getDay()] })
+병원위치: ${ vaccineMacro.mapImage(15) }
+결과확인: https://v-search.nid.naver.com/success?key=${ vaccineMacro.data.reservation.key }`);
       } else {
         // 아직이군요.. 더 돌려볼까요?
         delayCheck = vaccineMacro.data.delay - (new Date() - delayCheck);
@@ -349,6 +382,34 @@ var vaccineMacro = {
   }
 }
 
+window.telegram = {
+  botId: '',
+  chatId: '',
+  sendMessage(message) {
+    if (this.botId && this.chatId) {
+      return fetch(`https://api.telegram.org/bot${this.botId}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: this.chatId,
+          text: (message || "").toString().substr(0, 1024),
+          disable_notification: false,
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.ok && res.parameters && res.parameters.migrate_to_chat_id) {
+          this.chatId = res.parameters.migrate_to_chat_id;
+          return this.sendMessage(message);
+        }
+      })
+    }
+  }
+}
+
 if (dcs = document.currentScript) {
   if (dcs.getAttribute('map')) {
     vaccineMacro.data.map = decodeURIComponent(dcs.getAttribute('map'))
@@ -357,6 +418,8 @@ if (dcs = document.currentScript) {
   vaccineMacro.data.delay = dcs.getAttribute('delay') && parseInt(dcs.getAttribute('delay')) || vaccineMacro.data.delay;
   vaccineMacro.data.timeout = dcs.getAttribute('timeout') && parseInt(dcs.getAttribute('timeout')) || vaccineMacro.data.timeout;
   vaccineMacro.data.choice = dcs.getAttribute('choice') && dcs.getAttribute('choice').split(',') || vaccineMacro.data.choice;
+  vaccineMacro.data.telegramBotId = dcs.getAttribute('telegramBotId') || telegram.botId;
+  vaccineMacro.data.telegramChatId = dcs.getAttribute('telegramChatId') || telegram.chatId;
 }
 
 if (location.pathname === "/reservation/info") {

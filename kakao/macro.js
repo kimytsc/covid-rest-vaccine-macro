@@ -5,7 +5,7 @@
  * 작업순서
  * 1. 새 창 또는 새 탭을 열고 "https://www.daum.net"에 들어간다.
  * 2. 로그인을 한다.
- * 3. 새 창 또는 새 탭을 열고 "https://vaccine.kakao.com/api/v1/user"에 들어간다.
+ * 3. 새 창 또는 새 탭을 열고 "https://vaccine-map.kakao.com/api/v1/user"에 들어간다.
  *    만약, "{"error":"error occurred"}" 가 보인다면, 2번의 과정에서 로그아웃 후 다시 로그인을 하고 새로고침을 해본다.
  *    아니라면, 다음 과정을 이어서 한다.
  * 4. 3번창에서 F12를 눌러 DevTools 창을 띄운다
@@ -413,7 +413,7 @@ var vaccineMacro = {
 
         document.getElementById('processFinish').classList.add('on');
 
-        // kakao는 naver와는 달리 성공시 안내 페이지가 없어 페이지 이동 없음
+        setTimeout(() => {location.href = `https://vaccine-map.kakao.com/reservation/complete`}, 8000);
 
         if (window && window.navigator && window.navigator.vibrate) {
           // mobile에서 성공시 진동 알림 추가
@@ -422,6 +422,15 @@ var vaccineMacro = {
 
         // sound 출처: https://mixkit.co/free-sound-effects/clap/
         (new Audio("https://raw.githubusercontent.com/kimytsc/covid-rest-vaccine-macro/resources/main/sounds/mixkit-conference-audience-clapping-strongly-476.wav")).play()
+
+        // telegram
+        telegram.sendMessage(`축하합니다! 잔여백신 예약에 성공하셨습니다!
+병원이름: ${ vaccineMacro.data.reservation.orgName }
+전화번호: ${ vaccineMacro.data.reservation.phoneNumber }
+병원주소: ${ vaccineMacro.data.reservation.address }
+운영종료: 오늘 ${ vaccineMacro.data.reservation.organization.openHour.openHour.end } 까지 (${ vaccineMacro.data.reservation.organization.openHour.date } ${ vaccineMacro.data.reservation.organization.openHour.dayOfWeek })
+병원위치: ${ vaccineMacro.mapImage(5) }
+결과확인: https://talk-apps.kakao.com/scheme/kakaotalk://con/web?url=https%3A%2F%2Fvaccine-map.kakao.com%2Freservation%2Fcomplete&closable=false`);
       } else {
         // 아직이군요.. 더 돌려볼까요?
         delayCheck = vaccineMacro.data.delay - (new Date() - delayCheck);
@@ -691,6 +700,34 @@ var vaccineMacro = {
   // }
 };
 
+
+window.telegram = {
+  botId: '',
+  chatId: '',
+  sendMessage(message) {
+    if (this.botId && this.chatId) {
+      return fetch(`https://api.telegram.org/bot${this.botId}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: this.chatId,
+          text: (message || "").toString().substr(0, 1024)
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.ok && res.parameters && res.parameters.migrate_to_chat_id) {
+          this.chatId = res.parameters.migrate_to_chat_id;
+          return this.sendMessage(message);
+        }
+      })
+    }
+  }
+}
+
 if (dcs = document.currentScript) {
   if (dcs.getAttribute('map')) {
     vaccineMacro.data.map = decodeURIComponent(dcs.getAttribute('map'))
@@ -703,11 +740,13 @@ if (dcs = document.currentScript) {
   vaccineMacro.data.delay = dcs.getAttribute('delay') && parseInt(dcs.getAttribute('delay')) || vaccineMacro.data.delay;
   vaccineMacro.data.timeout = dcs.getAttribute('timeout') && parseInt(dcs.getAttribute('timeout')) || vaccineMacro.data.timeout;
   vaccineMacro.data.choice = dcs.getAttribute('choice') && dcs.getAttribute('choice').split(',') || vaccineMacro.data.choice;
+  telegram.telegramBotId = dcs.getAttribute('telegramBotId') || telegram.botId;
+  telegram.telegramChatId = dcs.getAttribute('telegramChatId') || telegram.chatId;
 }
 
-if (location.pathname === "/api/v1/user") {
+if (`${ location.origin }${ location.pathname }` === "https://vaccine-map.kakao.com/api/v1/user") {
   vaccineMacro.mounted().agreementCheck().then(res => res && res.init());
 } else {
   alert('내 정보 확인 페이지에서 사용 가능합니다.\n\n내 정보 확인 페이지로 이동하니, 다시 시도해주세요.');
-  location.href = "https://vaccine.kakao.com/api/v1/user"
+  location.href = "https://vaccine-map.kakao.com/api/v1/user"
 }

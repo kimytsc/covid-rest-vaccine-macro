@@ -77,57 +77,33 @@ var vaccineMacro = {
     bounds: "https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000;37.4560000;126.9260000;37.5170000",
-    telegram: {
-      botId: '759557168:AAE-kgXK7nAx3kk61A3J-M-iyeMNGo3i7tk',
-      chatId: '695009978',
-      sendMessage(message) {
-        return fetch(`https://api.telegram.org/bot${this.botId}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: this.chatId,
-            text: (message || "").toString().substr(0, 1024)
-          })
-        })
-        .then(res => res.json())
-        .then(res => {
-          if (!res.ok && res.parameters && res.parameters.migrate_to_chat_id) {
-            this.chatId = res.parameters.migrate_to_chat_id;
-            return this.sendMessage(message);
-          }
-        })
-      }
-    },
-    sampleOrganizations: [{
-      id: "19514283",
-      name: "명소아청소년과의원",
-      phone: "02-0000-0000",
-      roadAddress: "서울 영등포구 도림로38길 4",
-      x: "126.8971880",
-      y: "37.4926510",
-      vaccineQuantity: {
-        totalQuantity: 3,
-        startTime: "0900",
-        endTime: "1900",
-        vaccineOrganizationCode: "11346957",
-        list: [{
-          quantity: 1,
-          quantityStatus: "waiting",
-          vaccineType: "화이자"
-        }, {
-          quantity: 1,
-          quantityStatus: "waiting",
-          vaccineType: "모더나"
-        }, {
-          quantity: 1,
-          quantityStatus: "waiting",
-          vaccineType: "AZ"
-        }]
-      }
-    }]
+    // sampleOrganizations: [{
+    //   id: "19514283",
+    //   name: "명소아청소년과의원",
+    //   phone: "02-0000-0000",
+    //   roadAddress: "서울 영등포구 도림로38길 4",
+    //   x: "126.8971880",
+    //   y: "37.4926510",
+    //   vaccineQuantity: {
+    //     totalQuantity: 3,
+    //     startTime: "0900",
+    //     endTime: "1900",
+    //     vaccineOrganizationCode: "11346957",
+    //     list: [{
+    //       quantity: 1,
+    //       quantityStatus: "waiting",
+    //       vaccineType: "화이자"
+    //     }, {
+    //       quantity: 1,
+    //       quantityStatus: "waiting",
+    //       vaccineType: "모더나"
+    //     }, {
+    //       quantity: 1,
+    //       quantityStatus: "waiting",
+    //       vaccineType: "AZ"
+    //     }]
+    //   }
+    // }]
   },
   mounted() {
     vaccineMacro.data.bounds = vaccineMacro.data.bounds.indexOf('bounds=') !== -1 && vaccineMacro.data.bounds.substring(vaccineMacro.data.bounds.indexOf("bounds=")+7) || vaccineMacro.data.bounds;

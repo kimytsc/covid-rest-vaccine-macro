@@ -15,10 +15,10 @@
  * 
  * 
  * 원하는 크기의 지도 좌표를 구하는 방법
- * 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
+ * 1. "https://m.place.naver.com/rest/vaccine" 에서 원하는 위치, (적당한) 크기를 만든다.
  * 2. "현 지도에서 검색"을 누른다.
  * 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.
- *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000
+ *    ex) https://m.place.naver.com/rest/vaccine?x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000
  * 4. url을 다 복사하거나 bounds 부분만 복사한다.
  * 5. 복사한 값을 가지고 아래 소스 중 "bounds:" 부분의 값을 변경한다.
  */
@@ -74,7 +74,7 @@ var vaccineMacro = {
       // "VEN00019", // 시노백
       // "VEN00020", // 스푸트니크V
     ],
-    bounds: "https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
+    bounds: "https://m.place.naver.com/rest/vaccine?x=126.9015361&y=37.4858157&bounds=126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000%3B37.4560000%3B126.9260000%3B37.5170000",
     // bounds: "126.8770000;37.4560000;126.9260000;37.5170000",
     // sampleOrganizations: [{

@@ -16,10 +16,10 @@
  * 
  * 
  * 원하는 크기의 지도 좌표를 구하는 방법
- * 1. "https://m.place.naver.com/rest/vaccine?vaccineFilter=used" 에서 원하는 위치, (적당한) 크기를 만든다.
+ * 1. "https://m.place.naver.com/rest/vaccine" 에서 원하는 위치, (적당한) 크기를 만든다.
  * 2. "현 지도에서 검색"을 누른다.
  * 3. URL이 아래의 예제와 같이 바뀌는걸 확인한다.
- *    ex) https://m.place.naver.com/rest/vaccine?vaccineFilter=used&x=127.1054288&y=37.3594909&bounds=127.1022772%3B37.3577853%3B127.1085804%3B37.3611964
+ *    ex) https://m.place.naver.com/rest/vaccine?x=127.1054288&y=37.3594909&bounds=127.1022772%3B37.3577853%3B127.1085804%3B37.3611964
  * 4. url을 복사한 후 아래의 명령어를 값을 바꾸고 실행한다.
       ((url) => {
         coords = decodeURIComponent(url).split("bounds=")[1].split(";")

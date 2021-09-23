@@ -307,6 +307,7 @@ var vaccineMacro = {
     .then(res => {
       switch(res.code) {
         case 'SUCCESS':
+        case 'SUCCESS_2':
           vaccineMacro.data.reservation = Object.assign({datetime: new Date().toLocalDateTimeString(), key: key}, business);
           break;
         case 'SOLD_OUT':
